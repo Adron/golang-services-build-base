@@ -1,5 +1,10 @@
 # Computer Vision Service
 
+[![Go](https://github.com/your-org/vision-service/actions/workflows/go.yml/badge.svg)](https://github.com/your-org/vision-service/actions/workflows/go.yml)
+[![Coverage](https://img.shields.io/badge/coverage-80%25-brightgreen)](https://github.com/your-org/vision-service/actions/workflows/go.yml)
+[![Benchmarks](https://img.shields.io/badge/benchmarks-passing-brightgreen)](https://github.com/your-org/vision-service/actions/workflows/go.yml)
+[![Load Tests](https://img.shields.io/badge/load%20tests-passing-brightgreen)](https://github.com/your-org/vision-service/actions/workflows/go.yml)
+
 A Windows-based service for computer vision capabilities to identify lines of people and vehicles for order processing.
 
 ## Features
