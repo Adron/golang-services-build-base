@@ -5,14 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"vision-service/tests/testutils"
-
+	"github.com/adron/golang-services-build-base/tests/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestLoadHealthEndpoint(t *testing.T) {
 	config := testutils.LoadTestConfig()
-	server := startTestServer(t, config)
+	server := testutils.StartTestServer(t, config)
 	defer server.Close()
 
 	testutils.WaitForServer(t, server.URL, 5*time.Second)
@@ -74,7 +73,7 @@ func TestLoadHealthEndpoint(t *testing.T) {
 
 func TestLoadWithIncreasingConcurrency(t *testing.T) {
 	config := testutils.LoadTestConfig()
-	server := startTestServer(t, config)
+	server := testutils.StartTestServer(t, config)
 	defer server.Close()
 
 	testutils.WaitForServer(t, server.URL, 5*time.Second)

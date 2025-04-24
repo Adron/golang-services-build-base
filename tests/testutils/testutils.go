@@ -87,3 +87,23 @@ func ReadBody(t *testing.T, resp *http.Response) string {
 	}
 	return string(body)
 }
+
+// StartTestServer starts a test server with the given configuration
+func StartTestServer(t *testing.T, config map[string]string) *httptest.Server {
+	// Set environment variables from config
+	for k, v := range config {
+		t.Setenv(k, v)
+	}
+
+	// Create a new router
+	router := http.NewServeMux()
+	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"healthy","timestamp":"` + time.Now().Format(time.RFC3339) + `"}`))
+	})
+
+	// Create and start the server
+	server := httptest.NewServer(router)
+	return server
+}
