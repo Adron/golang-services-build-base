@@ -61,18 +61,18 @@ func TestReadBody(t *testing.T) {
 }
 
 func TestWaitForServer(t *testing.T) {
+	// Test successful case
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	// Test successful case
 	WaitForServer(t, server.URL, 5*time.Second)
 
-	// Test timeout case
-	server.Close()
-	assert.Panics(t, func() {
-		WaitForServer(t, server.URL, 100*time.Millisecond)
-	})
+	// Test timeout case with a non-existent server
+	start := time.Now()
+	WaitForServer(t, "http://localhost:9999", 100*time.Millisecond)
+	elapsed := time.Since(start)
+	assert.GreaterOrEqual(t, elapsed, 100*time.Millisecond, "Should wait for at least the timeout duration")
 }

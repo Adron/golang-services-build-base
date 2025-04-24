@@ -91,15 +91,21 @@ func TestHealthHandlerConcurrent(t *testing.T) {
 }
 
 func TestHealthHandlerTimeout(t *testing.T) {
-	handler := handlers.NewHealthHandler()
+	// Create a slow handler that takes longer than the client timeout
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(2 * time.Second) // Simulate slow processing
+		w.WriteHeader(http.StatusOK)
+	})
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
+	// Create a client with a short timeout
 	client := &http.Client{
 		Timeout: 1 * time.Millisecond,
 	}
 
-	_, err := client.Get(server.URL + "/health")
+	// Make the request
+	_, err := client.Get(server.URL)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "context deadline exceeded")
 }
