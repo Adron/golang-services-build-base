@@ -2,6 +2,7 @@ package testutils
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -57,15 +58,24 @@ func BenchmarkConfig() map[string]string {
 }
 
 // WaitForServer waits for the server to be ready
-func WaitForServer(t *testing.T, url string, timeout time.Duration) {
+func WaitForServer(t *testing.T, url string, timeout time.Duration) error {
 	start := time.Now()
+	client := &http.Client{
+		Timeout: 100 * time.Millisecond,
+	}
+
 	for {
 		if time.Since(start) > timeout {
-			t.Fatal("server did not become ready in time")
+			return fmt.Errorf("server did not become ready in time")
 		}
-		resp, err := http.Get(url + "/health")
+
+		resp, err := client.Get(url + "/health")
 		if err == nil && resp.StatusCode == http.StatusOK {
-			return
+			resp.Body.Close()
+			return nil
+		}
+		if resp != nil {
+			resp.Body.Close()
 		}
 		time.Sleep(100 * time.Millisecond)
 	}

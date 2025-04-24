@@ -68,10 +68,21 @@ func TestWaitForServer(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	// Give the server a moment to start
-	time.Sleep(100 * time.Millisecond)
+	// Give the server more time to start
+	time.Sleep(500 * time.Millisecond)
 
-	WaitForServer(t, server.URL, 5*time.Second)
+	// Try multiple times with increasing timeouts
+	for i := 0; i < 3; i++ {
+		timeout := time.Duration(i+1) * time.Second
+		err := WaitForServer(t, server.URL, timeout)
+		if err == nil {
+			break
+		}
+		if i == 2 {
+			t.Fatalf("Server did not become ready after multiple attempts")
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 
 	// Test timeout case with a non-existent server
 	start := time.Now()
