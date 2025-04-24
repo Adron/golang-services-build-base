@@ -4,10 +4,12 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
@@ -166,4 +168,68 @@ func BenchmarkHealthCheckParallel(b *testing.B) {
 			router.ServeHTTP(w, req)
 		}
 	})
+}
+
+func TestStartServer(t *testing.T) {
+	// Create a test server
+	startServer()
+
+	// Verify server is running
+	resp, err := http.Get("http://localhost:8080/health")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	resp.Body.Close()
+
+	// Clean up
+	stopServer()
+}
+
+func TestStopServer(t *testing.T) {
+	// Start server
+	startServer()
+
+	// Stop server
+	stopServer()
+
+	// Verify server is stopped
+	_, err := http.Get("http://localhost:8080/health")
+	assert.Error(t, err)
+}
+
+func TestRunService(t *testing.T) {
+	// Test headless mode
+	go runService(true)
+
+	// Wait for server to start
+	time.Sleep(100 * time.Millisecond)
+
+	// Verify server is running
+	resp, err := http.Get("http://localhost:8080/health")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	resp.Body.Close()
+
+	// Clean up
+	stopServer()
+}
+
+func TestMain(m *testing.M) {
+	// Set up test environment
+	os.Setenv("PORT", "8080")
+	os.Setenv("OTEL_ENDPOINT", "http://localhost:4318")
+	os.Setenv("LOG_LEVEL", "error")
+	os.Setenv("SERVICE_NAME", "vision-service-test")
+	os.Setenv("SERVICE_VERSION", "test")
+
+	// Run tests
+	code := m.Run()
+
+	// Clean up
+	os.Unsetenv("PORT")
+	os.Unsetenv("OTEL_ENDPOINT")
+	os.Unsetenv("LOG_LEVEL")
+	os.Unsetenv("SERVICE_NAME")
+	os.Unsetenv("SERVICE_VERSION")
+
+	os.Exit(code)
 }
