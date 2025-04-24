@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"vision-service/internal/handlers"
-	"vision-service/tests/testutils"
+	"github.com/adron/golang-services-build-base/internal/handlers"
+	"github.com/adron/golang-services-build-base/tests/testutils"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

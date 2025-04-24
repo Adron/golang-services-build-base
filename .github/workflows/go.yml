@@ -17,21 +17,30 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.23'
+        check-latest: true
 
     - name: Get dependencies
-      run: go mod download
+      run: |
+        go mod tidy
+        go mod download
 
     - name: Run tests
-      run: go test -v ./...
+      run: |
+        go test -v ./... || exit 1
+        echo "Tests completed"
 
     - name: Run coverage
-      run: ./scripts/coverage.sh
+      run: |
+        chmod +x ./scripts/coverage.sh
+        ./scripts/coverage.sh || exit 1
+        echo "Coverage completed"
 
     - name: Upload coverage report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: coverage/
+        if-no-files-found: error
 
   benchmark:
     name: Benchmark
@@ -43,9 +52,17 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.23'
+        check-latest: true
+
+    - name: Get dependencies
+      run: |
+        go mod tidy
+        go mod download
 
     - name: Run benchmarks
-      run: go test -bench=. -benchmem ./...
+      run: |
+        go test -bench=. -benchmem ./... || exit 1
+        echo "Benchmarks completed"
 
   load-test:
     name: Load Test
@@ -57,6 +74,14 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.23'
+        check-latest: true
+
+    - name: Get dependencies
+      run: |
+        go mod tidy
+        go mod download
 
     - name: Run load tests
-      run: go test -v ./tests/load/... 
+      run: |
+        go test -v ./tests/load/... || exit 1
+        echo "Load tests completed" 

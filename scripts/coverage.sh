@@ -1,22 +1,29 @@
 #!/bin/bash
 
+set -e  # Exit on error
+
 # Set up coverage directory
 COVERAGE_DIR="coverage"
 mkdir -p $COVERAGE_DIR
 
-# Run tests with coverage
 echo "Running tests with coverage..."
-go test -coverprofile=$COVERAGE_DIR/coverage.out -covermode=atomic ./...
+if ! go test -coverprofile=$COVERAGE_DIR/coverage.out -covermode=atomic ./...; then
+    echo "Error: Tests failed"
+    exit 1
+fi
 
-# Generate HTML coverage report
 echo "Generating HTML coverage report..."
-go tool cover -html=$COVERAGE_DIR/coverage.out -o $COVERAGE_DIR/coverage.html
+if ! go tool cover -html=$COVERAGE_DIR/coverage.out -o $COVERAGE_DIR/coverage.html; then
+    echo "Error: Failed to generate HTML coverage report"
+    exit 1
+fi
 
-# Generate coverage summary
 echo "Generating coverage summary..."
-go tool cover -func=$COVERAGE_DIR/coverage.out > $COVERAGE_DIR/coverage.txt
+if ! go tool cover -func=$COVERAGE_DIR/coverage.out > $COVERAGE_DIR/coverage.txt; then
+    echo "Error: Failed to generate coverage summary"
+    exit 1
+fi
 
-# Print coverage summary
 echo "Coverage Summary:"
 cat $COVERAGE_DIR/coverage.txt
 
