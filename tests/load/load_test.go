@@ -1,6 +1,7 @@
 package load
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -82,7 +83,7 @@ func TestLoadWithIncreasingConcurrency(t *testing.T) {
 	duration := 10 * time.Second
 
 	for _, concurrency := range concurrencyLevels {
-		t.Run("concurrency-"+string(concurrency), func(t *testing.T) {
+		t.Run(fmt.Sprintf("concurrency-%d", concurrency), func(t *testing.T) {
 			requests := make(chan int, concurrency)
 			errors := make(chan error, concurrency)
 
