@@ -78,3 +78,12 @@ func readBody(t *testing.T, resp *http.Response) string {
 	assert.NoError(t, err)
 	return string(body)
 }
+
+// ReadBody reads the response body and returns it as a string
+func ReadBody(t *testing.T, resp *http.Response) string {
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("Failed to read response body: %v", err)
+	}
+	return string(body)
+}

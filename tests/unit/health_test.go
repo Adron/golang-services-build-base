@@ -56,7 +56,7 @@ func TestHealthHandler(t *testing.T) {
 
 func TestHealthHandlerConcurrent(t *testing.T) {
 	handler := handlers.NewHealthHandler()
-	server := testutils.TestServer(t, handler)
+	server := httptest.NewServer(handler)
 	defer server.Close()
 
 	concurrency := 100
@@ -92,7 +92,7 @@ func TestHealthHandlerConcurrent(t *testing.T) {
 
 func TestHealthHandlerTimeout(t *testing.T) {
 	handler := handlers.NewHealthHandler()
-	server := testutils.TestServer(t, handler)
+	server := httptest.NewServer(handler)
 	defer server.Close()
 
 	client := &http.Client{
