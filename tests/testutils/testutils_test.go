@@ -68,6 +68,9 @@ func TestWaitForServer(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
+	// Give the server a moment to start
+	time.Sleep(100 * time.Millisecond)
+
 	WaitForServer(t, server.URL, 5*time.Second)
 
 	// Test timeout case with a non-existent server
